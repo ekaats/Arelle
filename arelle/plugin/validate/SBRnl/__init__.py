@@ -7,6 +7,8 @@ Created on Dec 12, 2013
 import os
 from arelle import ModelDocument, ModelValue, XmlUtil
 from arelle.ModelValue import qname
+from .Dimensions import checkFilingDimensions, checkSBRNLMembers
+
 try:
     import regex as re
 except ImportError:
@@ -25,7 +27,16 @@ def disclosureSystemConfigURL(disclosureSystem, *args, **kwargs):
     return os.path.join(os.path.dirname(__file__), "config.xml")
 
 def validateXbrlStart(val, parameters=None, *args, **kwargs):
-    val.validateSBRNLplugin = val.validateDisclosureSystem and getattr(val.disclosureSystem, "SBRNLplugin", False)
+    '''
+    Sets plugin specific arguments
+    '''
+    # Set SBR plugin = True
+    print(f"Starting validateXBRLStart (SBR plugin)")
+
+    # Set plugin flag based on value in pluginTypes
+    val.validateSBRNLplugin = "SBR.NL" in val.disclosureSystem.pluginTypes
+
+
     if not val.validateSBRNLplugin:
         return
 
@@ -33,8 +44,9 @@ def validateXbrlStart(val, parameters=None, *args, **kwargs):
     val.namespacePrefix = {}
     val.idObjects = {}
 
-
 def validateXbrlFinally(val):
+    filename = val.modelXbrl.uri
+    print(f"Starting validateXBRLFinally (SBR plugin) for {filename}")
     if not val.validateSBRNLplugin:
         return
 
@@ -43,16 +55,18 @@ def validateXbrlFinally(val):
     _statusMsg = _("validating {0} filing rules").format(val.disclosureSystem.name)
     modelXbrl.profileActivity()
     modelXbrl.modelManager.showStatus(_statusMsg)
-    
+
+    print("Validating filing rules")
     validateFiling(val, modelXbrl)
 
     modelXbrl.profileActivity(_statusMsg, minTimeToShow=0.0)
     modelXbrl.modelManager.showStatus(None)
-    
+
 def validateFinally(val, *args, **kwargs):
+    print(f"Starting validateFinally (SBR plugin)")
     if not val.validateSBRNLplugin:
         return
-    
+
     del val.prefixNamespace, val.namespacePrefix, val.idObjects
     
 def validateXbrlDtsDocument(val, modelDocument, isFilingDocument, *args, **kwargs):

@@ -409,7 +409,7 @@ def checkDTSdocument(val, modelDocument, isFilingDocument):
                                         modelObject=elt)
             if xlinkType == "resource":
 
-                # 20191015 - EK: added check for usage of variable. Other elements can contain empty linkroles not expected by tests.
+                # TODO: EK added check for empty linkRole. (for variable). Track possible issues
                 if not elt.prefixedName == "variable:parameter":
 
                     if elt.localName in ("label", "reference"):

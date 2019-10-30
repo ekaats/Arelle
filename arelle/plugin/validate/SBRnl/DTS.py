@@ -52,7 +52,7 @@ def checkFilingDTS(val, modelDocument, visited):
                     include=os.path.basename(referencedDocument.uri))
 
         if referencedDocument not in visited:
-            # TODO: Nested loop, rules such as 2.02.01.01 are reported multiple times. Schema rules should only be assessed once
+            # todo: Nested loop, rules such as 2.2.1.01 are reported multiple times. Schema rules should only be assessed once
             checkFilingDTS(val, referencedDocument, visited)
             
     if val.disclosureSystem.standardTaxonomiesDict is None:
